@@ -7,16 +7,13 @@ import java.util.List;
 
 import org.ats.common.PageList;
 import org.ats.services.OrganizationContext;
-import org.ats.services.organization.SpaceService;
 import org.ats.services.organization.TenantService;
 import org.ats.services.organization.UserService;
 import org.ats.services.organization.base.AuthenticationService;
 import org.ats.services.organization.entity.Tenant;
 import org.ats.services.organization.entity.User;
 import org.ats.services.organization.entity.fatory.ReferenceFactory;
-import org.ats.services.organization.entity.fatory.SpaceFactory;
 import org.ats.services.organization.entity.fatory.UserFactory;
-import org.ats.services.organization.entity.reference.SpaceReference;
 import org.ats.services.organization.entity.reference.TenantReference;
 
 import play.Logger;
@@ -54,15 +51,7 @@ public class AuthenticationController extends Controller {
   private ReferenceFactory<TenantReference> tenantRef;
   
   @Inject
-  private ReferenceFactory<SpaceReference> spaceRef;
-  
-  @Inject
   private UserService userService;
-  
-  @Inject
-  private SpaceService spaceService;
-  
-  @Inject private SpaceFactory spaceFactory;
   
   public Result checkAccount() {
     
@@ -104,7 +93,6 @@ public class AuthenticationController extends Controller {
     String password = json.get("password").asText();
     JsonNode tenant = json.get("tenant");
     String tenantId = tenant.get("_id").asText();
-    String spaceName = null;
     
     String firstName = json.get("firstname").asText();
     String lastName = json.get("lastname").asText();

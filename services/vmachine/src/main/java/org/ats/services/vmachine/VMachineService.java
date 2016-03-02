@@ -47,19 +47,33 @@ public class VMachineService extends AbstractMongoCRUD<VMachine>{
   }
   
   public VMachine getSystemVM(TenantReference tenantRef, SpaceReference spaceRef) {
-    return findOneAvailabel(tenantRef, spaceRef, true, false);
+    return findOne(tenantRef, spaceRef, true, false);
   }
   
   public VMachine getTestVMAvailabel(TenantReference tenantRef, SpaceReference spaceRef, boolean hasUI) {
-    return findOneAvailabel(tenantRef, spaceRef, false, hasUI);
+    return findOneAvailable(tenantRef, spaceRef, false, hasUI);
   }
   
-  public VMachine findOneAvailabel(TenantReference tenantRef, SpaceReference spaceRef, boolean system, boolean hasUI) {
+  public VMachine findOneAvailable(TenantReference tenantRef, SpaceReference spaceRef, boolean system, boolean hasUI) {
+    return findOne(tenantRef, spaceRef, system, hasUI, VMachine.Status.Started);
+  }
+  
+  public VMachine findOne(TenantReference tenantRef, SpaceReference spaceRef, boolean system, boolean hasUI, VMachine.Status status) {
     BasicDBObject query = new BasicDBObject("tenant", tenantRef.toJSon());
     query.put("space", spaceRef == null ? null : spaceRef.toJSon());
     query.put("system", system);
     query.put("ui", hasUI);
-    query.put("status", VMachine.Status.Started.toString());
+    query.put("status", status.toString());
+    
+    PageList<VMachine> list = query(query);
+    return list.count() > 0 ? list.next().get(0) : null;
+  }
+  
+  public VMachine findOne(TenantReference tenantRef, SpaceReference spaceRef, boolean system, boolean hasUI) {
+    BasicDBObject query = new BasicDBObject("tenant", tenantRef.toJSon());
+    query.put("space", spaceRef == null ? null : spaceRef.toJSon());
+    query.put("system", system);
+    query.put("ui", hasUI);
     
     PageList<VMachine> list = query(query);
     return list.count() > 0 ? list.next().get(0) : null;

@@ -1,5 +1,8 @@
 import java.lang.reflect.Method;
 
+import org.apache.http.HttpResponse;
+import org.ats.common.http.HttpClientFactory;
+import org.ats.common.http.HttpClientUtil;
 import org.ats.service.ReportModule;
 import org.ats.services.DataDrivenModule;
 import org.ats.services.ExecutorModule;
@@ -28,6 +31,8 @@ import org.ats.services.organization.entity.fatory.ReferenceFactory;
 import org.ats.services.organization.entity.fatory.TenantFactory;
 import org.ats.services.organization.entity.reference.SpaceReference;
 import org.ats.services.organization.entity.reference.TenantReference;
+import org.ats.services.vmachine.VMachine;
+import org.ats.services.vmachine.VMachineService;
 
 import play.Application;
 import play.GlobalSettings;
@@ -94,9 +99,17 @@ public class Global extends GlobalSettings {
       
       //hardcode to initialize fsoft tenant
       TenantService tenantService = injector.getInstance(TenantService.class);
-      Tenant fsoft = tenantService.get("fsoft");
+      Tenant fsoft = tenantService.get("FPT Software");
       if (fsoft == null) {
-        initializeTenant(injector, "fsoft");
+        initializeTenant(injector, "FPT Software");
+      } else {
+        HttpResponse response = HttpClientUtil.execute(HttpClientFactory.getInstance(), "http://ipinfo.io/ip");
+        String publicAddress = HttpClientUtil.getContentBodyAsString(response).trim();
+        VMachineService vmService = injector.getInstance(VMachineService.class);
+        ReferenceFactory<TenantReference> tenantRefFactory = injector.getInstance(Key.get(new TypeLiteral<ReferenceFactory<TenantReference>>(){}));
+        VMachine vm = vmService.getSystemVM(tenantRefFactory.create(fsoft.getId()), null);
+        vm.setPublicIp(publicAddress);
+        vmService.update(vm);
       }
       
     } catch (Exception e) {
