@@ -310,11 +310,12 @@ public class KeywordProjectServiceTestCase extends AbstractEventTestCase {
   @SuppressWarnings("unchecked")
   @Test
   public void testSuiteJsonTranforms() throws Exception {
-    String jsonSource = "{\"_id\":\"eaf35abe-1060-4fa0-9bd0-faa8f0d9dd1a\",\"name\":\"1\",\"init_driver\":\"wd = new FirefoxDriver();\",\"created_date\":{\"$date\":\"2015-08-05T07:59:41.749Z\"},\"cases\":[{\"_id\":\"e783a5c8-13ce-41aa-9010-3f56a188199b\"}],\"project_id\":\"d756b8b1-f30d-439f-8491-43a7572b9b34\"}";
+    String jsonSource = "{\"_id\":\"eaf35abe-1060-4fa0-9bd0-faa8f0d9dd1a\",\"name\":\"1\",\"init_driver\":\"wd = new FirefoxDriver();\",\"created_date\":{\"$date\":\"2015-08-05T07:59:41.749Z\"},\"cases\":[{\"_id\":\"e783a5c8-13ce-41aa-9010-3f56a188199b\"}],\"project_id\":\"d756b8b1-f30d-439f-8491-43a7572b9b34\",\"sequence_mode\":false}";
     ObjectMapper mapper = new ObjectMapper();
     HashMap<String, Object> map = mapper.readValue(jsonSource, HashMap.class);
     BasicDBObject obj = new BasicDBObject(map);
     Suite suite = suiteService.transform(obj);
-    Assert.assertEquals(new ObjectMapper().readTree(suite.toString()).toString(), jsonSource);
+    String actual = new ObjectMapper().readTree(suite.toString()).toString();
+    Assert.assertEquals(actual, jsonSource);
   }
 }

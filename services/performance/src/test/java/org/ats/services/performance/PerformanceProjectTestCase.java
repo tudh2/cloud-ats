@@ -153,6 +153,10 @@ public class PerformanceProjectTestCase extends AbstractEventTestCase{
     
     JMeterFactory factory = new JMeterFactory();
     JMeterScript script = factory.createRawJmeterScript(performanceProject.getId(), "Test Script", jmeterContent);
+    script.setLoops(1);
+    script.setNumberEngines(1);
+    script.setNumberThreads(100);
+    script.setRamUp(5);
     
     jmeterService.create(script);
     PageList<JMeterScript> pages = jmeterService.getJmeterScripts(performanceProject.getId());
@@ -200,11 +204,12 @@ public class PerformanceProjectTestCase extends AbstractEventTestCase{
   @SuppressWarnings("unchecked")
   @Test
   public void testScriptTransform() throws JsonParseException, JsonMappingException, IOException {
-    String jsonSource = "{\"_id\":\"92eba01e-f1a1-4d6c-a5eb-586487e009af\",\"name\":\"Testsdgsdgsgsgsdg\",\"loops\":1,\"number_threads\":1,\"ram_up\":5,\"scheduler\":false,\"duration\":0,\"samplers\":[{\"method\":\"GET\",\"name\":\"dsgsdg\",\"url\":\"sdgsdg\",\"assertion_text\":\"sdgsdgdg\",\"constant_time\":0,\"arguments\":[{\"paramName\":\"sdgsd\",\"paramValue\":\"gsdgsdg\"}]}],\"project_id\":\"73e29bd5-29aa-4b06-ab03-0162c5f0ec25\",\"raw\":false}";
+    String jsonSource = "{\"_id\":\"92eba01e-f1a1-4d6c-a5eb-586487e009af\",\"name\":\"Testsdgsdgsgsgsdg\",\"loops\":1,\"number_threads\":1,\"ram_up\":5,\"scheduler\":false,\"duration\":0,\"samplers\":[{\"method\":\"GET\",\"name\":\"dsgsdg\",\"url\":\"sdgsdg\",\"assertion_text\":\"sdgsdgdg\",\"constant_time\":0,\"arguments\":[{\"paramName\":\"sdgsd\",\"paramValue\":\"gsdgsdg\"}]}],\"project_id\":\"73e29bd5-29aa-4b06-ab03-0162c5f0ec25\",\"raw\":false,\"number_engines\":1}";
     ObjectMapper mapper = new ObjectMapper();
     HashMap<String, Object> map = mapper.readValue(jsonSource, HashMap.class);
     BasicDBObject obj = new BasicDBObject(map);
     JMeterScript script = jmeterService.transform(obj);
-    Assert.assertEquals(new ObjectMapper().readTree(script.toString()).toString(), jsonSource);
+    String actual = new ObjectMapper().readTree(script.toString()).toString() ; 
+    Assert.assertEquals(actual, jsonSource);
   }
 }

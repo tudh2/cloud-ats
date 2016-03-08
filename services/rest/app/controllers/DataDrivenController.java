@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -31,6 +32,7 @@ import play.mvc.Controller;
 import play.mvc.Http.MultipartFormData;
 import play.mvc.Result;
 import actions.CorsComposition;
+import au.com.bytecode.opencsv.CSVReader;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -78,7 +80,10 @@ public class DataDrivenController extends Controller {
       List<DataDriven> list = pages.next();
       
       for (DataDriven data : list) {
-        arrayData.add(Json.parse(data.toString()));
+    	ObjectNode obj = Json.newObject();
+    	obj.put("_id", data.getId());
+    	obj.put("name", data.getName());
+        arrayData.add(obj);
       }
     }
     return status(200, arrayData);
@@ -149,8 +154,22 @@ public class DataDrivenController extends Controller {
     return status(200, Json.parse(driven.toString()));
   }
   
-  public Result upload(String projectId,String caseId) {
+  public Result upload(String projectId,String caseId) throws FileNotFoundException {
     
+    if ("null".equals(projectId)) {
+      MultipartFormData body = request().body().asMultipartFormData();
+      MultipartFormData.FilePart typeFile = body.getFile("file");
+      String fileName = typeFile.getFilename();
+      File file = typeFile.getFile();
+      
+      BufferedReader br = new BufferedReader(new FileReader(file));
+      
+      ArrayNode array = readBufferByOpenCSV(br);
+      DataDriven data = dataDrivenFactory.create(fileName, array.toString());
+      dataDrivenService.create(data);
+      
+      return ok(Json.parse(data.toString()));
+    }
     //Get file csv upload
     MultipartFormData body = request().body().asMultipartFormData();
     MultipartFormData.FilePart typeFile = body.getFile("file");
@@ -229,5 +248,29 @@ public class DataDrivenController extends Controller {
     }
     return ok(Json.parse(dataDriven.toString()));
   }
+  @SuppressWarnings("resource")
+  private ArrayNode readBufferByOpenCSV(BufferedReader br) {
+    ArrayNode array = null;
+    try {
+      array = Json.newObject().arrayNode();
+      CSVReader reader = new CSVReader(br);
+      String[] nextLine;
+      String[] firstLine = reader.readNext();
+      while ((nextLine = reader.readNext()) != null) {
+        ObjectNode object = Json.newObject();
+        for (int i = 0; i < nextLine.length; i++) {
+          object.put(firstLine[i], nextLine[i]);
+        }
+        array.add(object);
+      }
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return array;
+
+  }
+  
 }
 
