@@ -5,7 +5,9 @@ import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Nguyen Thanh Hai</a>
@@ -33,7 +35,7 @@ public class HttpURL {
   }
 
   public HttpURL(String url, String ignoreParam) throws UnsupportedEncodingException {
-    query = new HashMap<String, String>();
+    query = new LinkedHashMap<String, String>();
 
     String string = url.trim().toLowerCase();
 
