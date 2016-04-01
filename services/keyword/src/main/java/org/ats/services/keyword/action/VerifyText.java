@@ -38,10 +38,10 @@ public class VerifyText extends AbstractAction {
 	sb.append("wd.findElement(@locator).getText().equals(@text)) {\n");
 	sb.append("    System.out.println(\"[End][Step]\"); \n");
     sb.append("    } else {\n");
-    sb.append("     wd.getScreenshotAs(FILE).renameTo(new File(\"target/error\"+System.currentTimeMillis()+\"verifyText.png\"));\n");
+    sb.append("     wd.getScreenshotAs(FILE).renameTo(new File(\"target/error_\"+System.currentTimeMillis()+\"_verifyText.png\"));\n");
     sb.append("    }\n");
 	sb.append("   } catch (Exception e) { \n");
-	sb.append("     wd.getScreenshotAs(FILE).renameTo(new File(\"target/error\"+System.currentTimeMillis()+\"verifyText.png\"));\n");
+	sb.append("     wd.getScreenshotAs(FILE).renameTo(new File(\"target/error_\"+System.currentTimeMillis()+\"_verifyText.png\"));\n");
 	sb.append("     e.printStackTrace();\n");
 	sb.append("     throw e ; \n");
 	sb.append("   }\n");
